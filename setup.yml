@@ -73,6 +73,10 @@
         enabled: True
         state: started
 
+    - name: Enable fail2ban for SSH
+      apt:
+        name: fail2ban
+
   handlers:
     - name: Restart Vault
       service:
