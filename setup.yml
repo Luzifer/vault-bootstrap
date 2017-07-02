@@ -1,0 +1,80 @@
+---
+
+- hosts: vault-servers
+  vars:
+    nginxle_version: v0.1.4
+    vault_version: 0.7.3
+
+  vars_files:
+    - vars/secrets.yml
+    
+  tasks:
+    - name: Install unzip
+      apt:
+        name: unzip
+        update_cache: True
+
+    - name: Install vault binary
+      unarchive:
+        src: 'https://releases.hashicorp.com/vault/{{ vault_version }}/vault_{{ vault_version }}_linux_amd64.zip'
+        dest: /usr/local/bin
+        remote_src: True
+      notify: Restart Vault
+
+    - name: Configure vault
+      template:
+        src: vault.hcl
+        dest: /etc/vault.hcl
+        mode: 0600
+      notify: Restart Vault
+
+    - name: Install vault service configuration
+      template:
+        src: vault.service
+        dest: /etc/systemd/system/vault.service
+
+    - name: Activate and start Vault
+      service:
+        name: vault
+        enabled: True
+        state: started
+
+    - name: Install nginx as a proxy server
+      apt:
+        name: nginx
+        update_cache: True
+        state: latest
+
+    - name: Stop and disable nginx service
+      service:
+        name: nginx
+        enabled: False
+        state: stopped
+
+    - name: Install nginx configuration
+      template:
+        src: nginx.conf
+        dest: /etc/nginx/nginx.conf
+
+    - name: Install nginx-letsencrypt
+      get_url:
+        url: 'https://github.com/Luzifer/nginx-letsencrypt/releases/download/{{ nginxle_version }}/nginx-letsencrypt_linux_amd64'
+        dest: /usr/local/bin/nginx-letsencrypt
+        mode: 0755
+
+    - name: Install nginx-letsencrypt service configuration
+      template:
+        src: nginx-letsencrypt.service
+        dest: /etc/systemd/system/nginx-letsencrypt.service
+
+    - name: Activate and start nginx-letsencrypt
+      service:
+        name: nginx-letsencrypt
+        enabled: True
+        state: started
+
+  handlers:
+    - name: Restart Vault
+      service:
+        name: vault
+        state: restarted

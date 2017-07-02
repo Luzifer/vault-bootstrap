@@ -1,0 +1,18 @@
+[Unit]
+Description=nginx wrapper with LetsEncrypt certificate management
+After=network-online.target
+Requires=network-online.target
+
+[Service]
+Restart=always
+ExecStartPre=/bin/mkdir -p /data/ssl
+ExecStart=/usr/local/bin/nginx-letsencrypt \
+            --email {{ email }} \
+            --nginx-config /etc/nginx/nginx.conf \
+            --storage-dir /data/ssl \
+            --log-level debug \
+            --listen-http :5002
+
+[Install]
+WantedBy=multi-user.target
+

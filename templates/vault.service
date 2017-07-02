@@ -1,0 +1,11 @@
+[Unit]
+Description=Hashicorp Vault secret store
+
+[Service]
+Restart=always
+RestartSec=5
+
+ExecStart=/usr/local/bin/vault server -config=/etc/vault.hcl
+
+[Install]
+WantedBy=multi-user.target
