@@ -19,6 +19,7 @@
         src: 'https://releases.hashicorp.com/vault/{{ vault_version }}/vault_{{ vault_version }}_linux_amd64.zip'
         dest: /usr/local/bin
         remote_src: True
+        creates: /usr/local/bin/vault
       notify: Restart Vault
 
     - name: Configure vault
