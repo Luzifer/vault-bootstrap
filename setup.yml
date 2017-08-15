@@ -14,20 +14,26 @@
         name: unzip
         update_cache: True
 
+    # vault related
+
+    - name: Check Vault version
+      command: '/usr/local/bin/vault --version | grep -q "Vault v{{ vault_version }}"'
+      register: check_vault_version
+
     - name: Install vault binary
       unarchive:
         src: 'https://releases.hashicorp.com/vault/{{ vault_version }}/vault_{{ vault_version }}_linux_amd64.zip'
         dest: /usr/local/bin
         remote_src: True
-        creates: /usr/local/bin/vault
-      notify: Restart Vault
+      when: check_vault_version|failed
+      register: install_vault_binary
 
     - name: Configure vault
       template:
         src: vault.hcl
         dest: /etc/vault.hcl
         mode: 0600
-      notify: Restart Vault
+      register: configure_vault
 
     - name: Install vault service configuration
       template:
@@ -39,6 +45,14 @@
         name: vault
         enabled: True
         state: started
+
+    - name: Restart Vault on changes
+      service:
+        name: vault
+        state: restarted
+      when: install_vault_binary.changed or configure_vault.changed
+
+    # nginx-letsencrypt related
 
     - name: Install nginx as a proxy server
       apt:
@@ -77,9 +91,3 @@
     - name: Enable fail2ban for SSH
       apt:
         name: fail2ban
-
-  handlers:
-    - name: Restart Vault
-      service:
-        name: vault
-        state: restarted
