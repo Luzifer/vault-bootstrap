@@ -7,6 +7,13 @@
 
   vars_files:
     - vars/secrets.yml
+
+  roles:
+    - role: Luzifer.ubuntu-unattended-upgrades
+      mail_target: knut@ahlers.me
+      reboot_time: 04:00
+      do_reboot: "true"
+      do_autoremove: "true"
     
   tasks:
     - name: Install unzip
