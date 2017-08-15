@@ -3,7 +3,7 @@
 - hosts: vault-servers
   vars:
     nginxle_version: v0.1.4
-    vault_version: 0.7.3
+    vault_version: 0.8.0
 
   vars_files:
     - vars/secrets.yml
