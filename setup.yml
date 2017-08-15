@@ -98,3 +98,17 @@
     - name: Enable fail2ban for SSH
       apt:
         name: fail2ban
+
+    - name: Set up logrotate for audit logs
+      copy:
+        dest: /etc/logrotate.d/vault
+        content: |
+          /var/log/vault/audit.log {
+            missingok
+            notifempty
+            compress
+            copytruncate
+            daily
+            maxsize 100M
+            rotate 7
+          }
