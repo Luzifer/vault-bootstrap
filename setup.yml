@@ -3,7 +3,7 @@
 - hosts: vault-servers
   vars:
     nginxle_version: v0.1.4
-    vault_version: 0.8.0
+    vault_version: 0.8.1
 
   vars_files:
     - vars/secrets.yml
@@ -23,8 +23,8 @@
 
     # vault related
 
-    - name: Check Vault version
-      command: '/usr/local/bin/vault --version | grep -q "Vault v{{ vault_version }}"'
+    - name: Get Vault version
+      command: '/usr/local/bin/vault --version'
       register: check_vault_version
 
     - name: Install vault binary
@@ -32,7 +32,7 @@
         src: 'https://releases.hashicorp.com/vault/{{ vault_version }}/vault_{{ vault_version }}_linux_amd64.zip'
         dest: /usr/local/bin
         remote_src: True
-      when: check_vault_version|failed
+      when: '"Vault v{{ vault_version }}" not in check_vault_version.stdout'
       register: install_vault_binary
 
     - name: Configure vault
