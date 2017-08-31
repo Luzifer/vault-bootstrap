@@ -7,6 +7,7 @@ Requires=network-online.target
 Restart=always
 ExecStartPre=/bin/mkdir -p /data/ssl
 ExecStart=/usr/local/bin/nginx-letsencrypt \
+            --buffer 720h \
             --email {{ email }} \
             --nginx-config /etc/nginx/nginx.conf \
             --storage-dir /data/ssl \
