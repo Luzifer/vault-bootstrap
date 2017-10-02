@@ -1,8 +1,9 @@
 backend "mysql" {
-  username = "{{ database.username }}"
-  password = "{{ database.password }}"
-  database = "{{ database.database }}"
-  address  = "{{ database.hostname }}"
+  username     = "{{ database.username }}"
+  password     = "{{ database.password }}"
+  database     = "{{ database.database }}"
+  address      = "{{ database.hostname }}"
+  max_parallel = "10"
 }
 
 listener "tcp" {
